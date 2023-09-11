@@ -7,29 +7,73 @@ function UseState({ name }) {
   const [state, setState] = React.useState({
     error: false,
     loading: false,
-    value: ''
+    value: '',
+    delete: false,
+    confirm: false
   })
+
+  const onConfirm = () => {
+    setState({
+      ...state,
+      error:false,
+      loading:false,
+      confirm: true
+    });
+  }
+  const onError = () => {
+    setState({
+      ...state,
+      error:true,
+      loading: false
+    });
+  }
+  const onCheck = () => {
+    setState({
+      ...state,
+      loading: true})
+  }
+  const onDelete = () => {
+    setState({
+      ...state,
+      delete:true
+    })
+  }
+  const onNoConfirm = () => {
+    setState({
+      ...state,
+      confirm:false,
+      value: ''
+    })
+  }
+  const onRecover = () => {
+    setState({
+      ...state,
+      confirm:false,
+      delete: false,
+      value: ''
+    })
+  }
+  const onInput = (value) => {
+    setState({
+      ...state,
+      value: value
+    })
+  }
+
   React.useEffect(() => {
     if (state.loading) {
       setTimeout(() => {
 
         if (state.value === SECURITY_PASS) {
-          setState({
-            ...state,
-            error:false,
-            loading:false
-          });
+          onConfirm()
         } else {
-          setState({
-            ...state,
-            error:true,
-            loading: false
-          });
+          onError()
         } 
       }, 3000);
     }
   }, [state.loading]);
   
+  if (!state.delete && !state.confirm){
   return (
     <div>
       <h2>Eliminar {name}</h2> 
@@ -45,18 +89,39 @@ function UseState({ name }) {
   
       <input placeholder="Código de seguridad"
         value={state.value}
-        onChange= {(event)=> {setState({
-          ...state,
-          value: event.target.value})}} 
+        onChange= {(event)=> {
+          onInput(event.target.value)
+        }} 
       />
       <button
-        onClick={() => setState({
-          ...state,
-          loading: true})}>
+        onClick={onCheck}>
         Comprobar
       </button>
     </div>
   );
+ } else if (state.confirm && !state.delete){
+  return (
+    <React.Fragment>
+      <h2>Eliminar Use State</h2>
+      <p>Seguro quieres eliminar UseState?</p>
+      <button
+        onClick={(onDelete)}
+      >Si, eliminar</button>
+      <button
+        onClick={(onNoConfirm)}
+      >No, volver</button>
+    </React.Fragment>
+  )
+ } else {
+  return (
+    <React.Fragment>
+      <h2>Eliminado Use State</h2>
+      <button
+        onClick={(onRecover)}
+      >Recuperar</button>
+    </React.Fragment>
+  )
+ }
 }
 
 export {UseState};
